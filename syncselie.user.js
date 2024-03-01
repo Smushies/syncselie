@@ -1,5 +1,6 @@
 // ==UserScript==
 // @name            Syncselie
+// @author          Smushies
 // @namespace       https://steamcommunity.com/id/smushies/
 // @description     Exports a Barter.vg list to Steam, then run a gg.deals wishlist sync.
 // @match           http*://barter.vg/u/*/*/x*
