@@ -4,7 +4,7 @@
 // @namespace       https://steamcommunity.com/id/smushies/
 // @description     Exports a Barter.vg list to Steam, then run a gg.deals wishlist sync.
 // @match           http*://barter.vg/u/*/*/x*
-// @version         0.6
+// @version         0.7
 // @run-at          document-end
 // @grant           GM.xmlHttpRequest
 // @connect			gg.deals
@@ -117,7 +117,6 @@ async function getGGDealsInfo() {
 	if (ggUsername != username.slice(0,ggUsername.length)) {
 		updateSyncselieLogs(`Steam user ${username.slice(0,ggUsername.length)} and gg.deals user ${ggUsername} do not match. Are you on the right account?`, 1);
 	}
-	username = ggUsername;
 	updateSyncselieLogs(`Got ${username}'s gg.deals wishlist of ${ggWishlist.length} items`);
 }
 
@@ -146,7 +145,7 @@ function confirmDifferences() {
 	confirmer.addEventListener('click', wishselie);
 	log.appendChild(document.createTextNode("("));
 	log.appendChild(confirmer)
-	log.appendChild(document.createTextNode(`)  ${username} Wishlist: Add ${needAdd.length} / Remove ${needRemove.length}`));
+	log.appendChild(document.createTextNode(`)  ${username}: Add ${needAdd.length} / Remove ${needRemove.length}`));
 	
 	document.getElementById('syncselieLog').prepend(log);
 }
