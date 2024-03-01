@@ -4,7 +4,7 @@
 // @namespace       https://steamcommunity.com/id/smushies/
 // @description     Exports a Barter.vg list to Steam, then run a gg.deals wishlist sync.
 // @match           http*://barter.vg/u/*/*/x*
-// @version         0.5
+// @version         0.6
 // @run-at          document-end
 // @grant           GM.xmlHttpRequest
 // @connect			gg.deals
@@ -173,7 +173,7 @@ async function wishselie() {
 		await addSteamWishlist(g)
 	),
 	needRemove.map(async (g) =>
-		await addSteamWishlist(g)
+		await removeSteamWishlist(g)
 	));
 	
 	if (needAdd.length > 0)
