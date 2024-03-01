@@ -1,10 +1,9 @@
 // ==UserScript==
 // @name            Syncselie
-// @author          Smushies
 // @namespace       https://steamcommunity.com/id/smushies/
 // @description     Exports a Barter.vg list to Steam, then run a gg.deals wishlist sync.
 // @match           http*://barter.vg/u/*/*/x*
-// @version         0.2
+// @version         0.3
 // @run-at          document-end
 // @grant           GM.xmlHttpRequest
 // @connect			gg.deals
@@ -39,7 +38,7 @@ function addHtml() {
 	
 	const syncUpdates = document.createElement('span');
 	syncUpdates.setAttribute('id', 'syncselieLog');
-	syncUpdates.setAttribute('style', 'overflow:auto; height:8.125em; display:none; float:right');
+	syncUpdates.setAttribute('style', 'overflow:auto; height:9.75em; display:none; float:right');
 	container.after(syncUpdates);
 }
 
@@ -137,8 +136,6 @@ async function getBarterList(path) {
 function confirmDifferences() {
 	needAdd = barterList.filter(x => x.type == 1 && !steamWishlist.some(y => y.id == x.id));
 	needRemove = steamWishlist.filter(x => !barterList.some(y => y.id == x.id));
-	console.log(needAdd);
-	console.log(needRemove);
 	
 	let log = document.createElement('div');
 	log.id = "confirmMe";
@@ -193,6 +190,8 @@ async function wishselie() {
 		let names = needRemove.filter(g => g.failed).reduce((a,g) => a + g.name + ", ", "");
 		updateSyncselieLogs(`Failed to remove: ${names}`, 1);
 	}
+	
+	syncselieGG();
 }
 
 async function addSteamWishlist(game) {
@@ -229,7 +228,21 @@ async function removeSteamWishlist(game) {
 	}
 	
 	needRemove.find(g => g.id == game.id).failed = !data.success;
-	
+}
+
+///TODO: Finish this function
+function syncselieGG() {
+	let logElem = document.getElementById('syncselieLog');
+	updateSyncselieLogs(`TODO: Sync with gg.deals.`, 2);
+	let addSubs = barterList.filter(x => x.type == 2 && !ggWishlist.some(y => y == x.name));
+	addSubs.forEach(s => {
+		let node = document.createElement('div');
+		node.innerHTML = `❌ Need to wishlist ${s.name} at <a href="https://gg.deals/steam/sub/${s.id}" target="_blank">https://gg.deals/steam/sub/${s.id}</a>`;
+		logElem.prepend(node);
+	});
+	let removeSubs = ggWishlist.filter(x => barterList.some(y => y.id == x));
+	removeSubs.forEach(s => updateSyncselieLogs(`Need to remove ${s.name} from gg.deals wishlist`, 1));
+	updateSyncselieLogs(`TODO: Do sub add/remove automagically.`, 2);
 }
 
 function makeRequest(method, url, data = null, headers = null) {
