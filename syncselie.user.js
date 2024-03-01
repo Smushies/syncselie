@@ -4,7 +4,7 @@
 // @namespace       https://steamcommunity.com/id/smushies/
 // @description     Exports a Barter.vg list to Steam, then run a gg.deals wishlist sync.
 // @match           http*://barter.vg/u/*/*/x*
-// @version         0.4
+// @version         0.5
 // @run-at          document-end
 // @grant           GM.xmlHttpRequest
 // @connect			gg.deals
@@ -116,7 +116,6 @@ async function getGGDealsInfo() {
 	}
 	if (ggUsername != username.slice(0,ggUsername.length)) {
 		updateSyncselieLogs(`Steam user ${username.slice(0,ggUsername.length)} and gg.deals user ${ggUsername} do not match. Are you on the right account?`, 1);
-		throw new Error("Steam user and gg.deals user do not match. Are you on the right account?");
 	}
 	username = ggUsername;
 	updateSyncselieLogs(`Got ${username}'s gg.deals wishlist of ${ggWishlist.length} items`);
