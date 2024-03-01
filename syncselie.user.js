@@ -4,7 +4,7 @@
 // @namespace       https://steamcommunity.com/id/smushies/
 // @description     Exports a Barter.vg list to Steam, then run a gg.deals wishlist sync.
 // @match           http*://barter.vg/u/*/*/x*
-// @version         0.7
+// @version         0.8
 // @run-at          document-end
 // @grant           GM.xmlHttpRequest
 // @connect			gg.deals
@@ -86,17 +86,24 @@ async function getInfo() {
 }
 
 async function getSteamWishlist(path) {
+	steamWishlist = [];
+	await gSW(path + "/wishlistdata", 0);
+	updateSyncselieLogs(`Got ${username} of ${steamWishlist.length} steam apps`, 0);
+}
+
+async function gSW(path, count) {
 	let headers = { "Cache-Control": "no-cache" };
-	let resp = await makeRequest("GET", path + "/wishlistdata", null, headers)
+	let resp = await makeRequest("GET", path + `?p=${count}`, null, headers)
 	.catch(error => {
 		updateSyncselieLogs(`Steam wishlistdata call failed. ${JSON.stringify(error)}`, 1);
 		throw new Error(`Steam wishlistdata call failed. ${JSON.stringify(error)}`);
 	});
-	
 	let data = JSON.parse(resp.responseText);
 	let keys = Object.keys(data);
-	steamWishlist = Object.values(data).map((x,i) => ({id: keys[i], name: x.name}));
-	updateSyncselieLogs(`Got ${username} of ${steamWishlist.length} steam apps`, 0);
+	if (keys.length < 1)
+		return;
+	steamWishlist.push(...Object.values(data).map((x,i) => ({id: keys[i], name: x.name})));
+	await gSW(path, count+1);
 }
 
 async function getGGDealsInfo() {
@@ -168,12 +175,7 @@ async function wishselie() {
 		logElem.prepend(adds);
 	}
 	
-	await Promise.all(needAdd.map(async (g) =>
-		await addSteamWishlist(g)
-	),
-	needRemove.map(async (g) =>
-		await removeSteamWishlist(g)
-	));
+	await Promise.all([addGames(needAdd), removeGames(needRemove)]);
 	
 	if (needAdd.length > 0)
 		document.getElementById('steamAdds').textContent = "✔️" + document.getElementById('steamAdds').textContent.substring(1);
@@ -193,6 +195,17 @@ async function wishselie() {
 	syncselieGG();
 }
 
+// Done 1-by-1 to reduce errors
+async function addGames(games) {
+	for (let a of games)
+		await addSteamWishlist(a);
+}
+
+async function removeGames(games) {
+	for (let r of games)
+		await removeSteamWishlist(r);
+}
+
 async function addSteamWishlist(game) {
 	let headers = { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8", "Origin": "https://store.steampowered.com", "Cache-Control": "no-cache" };
 	let resp = await makeRequest("POST", "https://store.steampowered.com/api/addtowishlist", `appid=${game.id}`, headers)
@@ -206,6 +219,9 @@ async function addSteamWishlist(game) {
 	if (data.success) {
 		let addElem = document.getElementById('steamAdds');
 		addElem.textContent += `${game.name}, `;
+	}
+	else {
+		console.log(data);
 	}
 	
 	needAdd.find(g => g.id == game.id).failed = !data.success;
@@ -224,6 +240,9 @@ async function removeSteamWishlist(game) {
 	if (data.success) {
 		let remElem = document.getElementById('steamRemoves');
 		remElem.textContent += `${game.name}, `;
+	}
+	else {
+		console.log(data);
 	}
 	
 	needRemove.find(g => g.id == game.id).failed = !data.success;
