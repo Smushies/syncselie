@@ -4,7 +4,7 @@
 // @namespace       https://steamcommunity.com/id/smushies/
 // @description     Exports a Barter.vg list to Steam, then run a gg.deals wishlist sync.
 // @match           http*://barter.vg/u/*/*/x*
-// @version         0.8
+// @version         0.9
 // @run-at          document-end
 // @grant           GM.xmlHttpRequest
 // @connect			gg.deals
