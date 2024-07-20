@@ -116,15 +116,7 @@ async function getGGDealsInfo() {
 	const parser = new DOMParser();
 	const htmlDoc = parser.parseFromString(resp.responseText, 'text/html');
 	ggWishlist = Array.from(htmlDoc.getElementsByClassName('game-info-title')).map(x => x.textContent);
-	let ggUsername = htmlDoc.getElementsByClassName('menu-profile-label')[0].childNodes[0].textContent;
-	if (ggUsername.length == 0) {
-		updateSyncselieLogs(`gg.deals user missing. Are you signed into gg.deals?`, 1);
-		throw new Error("gg.deals user missing. Are you signed into gg.deals?");
-	}
-	if (ggUsername != username.slice(0,ggUsername.length)) {
-		updateSyncselieLogs(`Steam user ${username.slice(0,ggUsername.length)} and gg.deals user ${ggUsername} do not match. Are you on the right account?`, 1);
-	}
-	updateSyncselieLogs(`Got ${username}'s gg.deals wishlist of ${ggWishlist.length} items`);
+	updateSyncselieLogs(`Got gg.deals wishlist of ${ggWishlist.length} items`);
 }
 
 async function getBarterList(path) {
